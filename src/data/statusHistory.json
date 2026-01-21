@@ -1,0 +1,59 @@
+{
+  "history": [
+    {
+      "id": "hist-001",
+      "projectId": "00001",
+      "module": "Scope",
+      "recordId": "scope-001",
+      "fromStatus": "Grooming",
+      "toStatus": "Completed",
+      "reason": "Scope finalized after stakeholder review",
+      "changedBy": "usr-002",
+      "changedAt": "2024-01-13T15:00:00Z"
+    },
+    {
+      "id": "hist-002",
+      "projectId": "00001",
+      "module": "Estimate",
+      "recordId": "est-001",
+      "fromStatus": "Sent for Internal Review",
+      "toStatus": "Sent for External Review",
+      "reason": "Internal review completed, moving to external",
+      "changedBy": "usr-004",
+      "changedAt": "2024-01-15T11:00:00Z"
+    },
+    {
+      "id": "hist-003",
+      "projectId": "00002",
+      "module": "Estimate",
+      "recordId": "est-003",
+      "fromStatus": "Sent for Internal Review",
+      "toStatus": "Approved",
+      "reason": "Approved - internal project, no external review needed",
+      "changedBy": "usr-006",
+      "changedAt": "2024-01-14T10:00:00Z"
+    },
+    {
+      "id": "hist-004",
+      "projectId": "00002",
+      "module": "VE",
+      "recordId": "ve-001",
+      "fromStatus": "Estimate loaded in VE tool",
+      "toStatus": "Waiting for Approval",
+      "reason": "VE entry submitted for stakeholder approval",
+      "changedBy": "usr-003",
+      "changedAt": "2024-01-14T15:00:00Z"
+    },
+    {
+      "id": "hist-005",
+      "projectId": "00004",
+      "module": "VE",
+      "recordId": "ve-002",
+      "fromStatus": "Waiting for Approval",
+      "toStatus": "Estimate Fully Approved",
+      "reason": "All stakeholders approved",
+      "changedBy": "usr-006",
+      "changedAt": "2024-01-20T10:00:00Z"
+    }
+  ]
+}

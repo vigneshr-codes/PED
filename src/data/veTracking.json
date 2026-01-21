@@ -1,0 +1,38 @@
+{
+  "veRecords": [
+    {
+      "id": "ve-001",
+      "projectId": "00002",
+      "submissionName": "API Gateway - VE Submission",
+      "veToolReference": "https://vetool.company.com/submissions/VE-2024-001",
+      "veFTP": 800,
+      "veDollarValue": 120000,
+      "status": "Waiting for Approval",
+      "submittedBy": "usr-003",
+      "submittedDate": "2024-01-14T11:00:00Z",
+      "approvedDate": null,
+      "stakeholders": ["usr-006"],
+      "notes": "Submitted to VE tool, awaiting final approval",
+      "isLatest": true,
+      "createdAt": "2024-01-14T11:00:00Z",
+      "updatedAt": "2024-01-14T15:00:00Z"
+    },
+    {
+      "id": "ve-002",
+      "projectId": "00004",
+      "submissionName": "Analytics Dashboard - VE Submission",
+      "veToolReference": "https://vetool.company.com/submissions/VE-2024-002",
+      "veFTP": 600,
+      "veDollarValue": 90000,
+      "status": "Estimate Fully Approved",
+      "submittedBy": "usr-003",
+      "submittedDate": "2024-01-18T15:00:00Z",
+      "approvedDate": "2024-01-20T10:00:00Z",
+      "stakeholders": ["usr-006"],
+      "notes": "Fully approved - project ready to start",
+      "isLatest": true,
+      "createdAt": "2024-01-18T15:00:00Z",
+      "updatedAt": "2024-01-20T10:00:00Z"
+    }
+  ]
+}

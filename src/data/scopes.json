@@ -1,0 +1,79 @@
+{
+  "scopes": [
+    {
+      "id": "scope-001",
+      "projectId": "00001",
+      "scopeTitle": "Customer Portal Redesign - Full Scope",
+      "scopeType": "Functional",
+      "artifactLink": "https://sharepoint.com/docs/scope-001-v2.docx",
+      "version": 2,
+      "status": "Completed",
+      "comments": "Final scope approved by stakeholders",
+      "createdBy": "usr-002",
+      "updatedBy": "usr-002",
+      "createdAt": "2024-01-10T10:30:00Z",
+      "updatedAt": "2024-01-13T15:00:00Z",
+      "isLatest": true
+    },
+    {
+      "id": "scope-002",
+      "projectId": "00001",
+      "scopeTitle": "Customer Portal Redesign - Initial Scope",
+      "scopeType": "Functional",
+      "artifactLink": "https://sharepoint.com/docs/scope-001-v1.docx",
+      "version": 1,
+      "status": "Completed",
+      "comments": "Initial draft",
+      "createdBy": "usr-002",
+      "updatedBy": "usr-002",
+      "createdAt": "2024-01-10T10:30:00Z",
+      "updatedAt": "2024-01-11T12:00:00Z",
+      "isLatest": false
+    },
+    {
+      "id": "scope-003",
+      "projectId": "00002",
+      "scopeTitle": "API Gateway - Technical Scope",
+      "scopeType": "Technical",
+      "artifactLink": "https://sharepoint.com/docs/scope-002.docx",
+      "version": 1,
+      "status": "Completed",
+      "comments": "Technical scope document ready",
+      "createdBy": "usr-003",
+      "updatedBy": "usr-003",
+      "createdAt": "2024-01-12T10:00:00Z",
+      "updatedAt": "2024-01-13T09:00:00Z",
+      "isLatest": true
+    },
+    {
+      "id": "scope-004",
+      "projectId": "00003",
+      "scopeTitle": "Mobile App Phase 2 - Feature Scope",
+      "scopeType": "Functional",
+      "artifactLink": "https://sharepoint.com/docs/scope-003.docx",
+      "version": 1,
+      "status": "Grooming",
+      "comments": "In grooming session with product team",
+      "createdBy": "usr-002",
+      "updatedBy": "usr-002",
+      "createdAt": "2024-01-14T09:00:00Z",
+      "updatedAt": "2024-01-15T10:00:00Z",
+      "isLatest": true
+    },
+    {
+      "id": "scope-005",
+      "projectId": "00004",
+      "scopeTitle": "Analytics Dashboard - Requirements",
+      "scopeType": "Functional",
+      "artifactLink": "https://sharepoint.com/docs/scope-004.docx",
+      "version": 1,
+      "status": "Completed",
+      "comments": "Scope finalized",
+      "createdBy": "usr-002",
+      "updatedBy": "usr-002",
+      "createdAt": "2024-01-08T11:00:00Z",
+      "updatedAt": "2024-01-10T14:00:00Z",
+      "isLatest": true
+    }
+  ]
+}

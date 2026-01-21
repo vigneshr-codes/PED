@@ -1,0 +1,40 @@
+{
+  "users": [
+    {
+      "id": "usr-001",
+      "name": "John Smith",
+      "email": "john.smith@company.com",
+      "role": "Admin"
+    },
+    {
+      "id": "usr-002",
+      "name": "Sarah Johnson",
+      "email": "sarah.johnson@company.com",
+      "role": "Requestor"
+    },
+    {
+      "id": "usr-003",
+      "name": "Mike Chen",
+      "email": "mike.chen@company.com",
+      "role": "Estimator"
+    },
+    {
+      "id": "usr-004",
+      "name": "Emily Davis",
+      "email": "emily.davis@company.com",
+      "role": "Internal Reviewer"
+    },
+    {
+      "id": "usr-005",
+      "name": "Robert Wilson",
+      "email": "robert.wilson@company.com",
+      "role": "External Reviewer"
+    },
+    {
+      "id": "usr-006",
+      "name": "Lisa Anderson",
+      "email": "lisa.anderson@company.com",
+      "role": "Approver"
+    }
+  ]
+}
