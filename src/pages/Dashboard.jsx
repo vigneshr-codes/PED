@@ -1,61 +1,133 @@
 import React, { useMemo } from 'react';
-import { useSelector } from 'react-redux';
-import { KPICard } from '../components/common';
+import { useSelector, useDispatch } from 'react-redux';
+import { FilterBar } from '../components/common';
+import DashboardKPIs from '../components/dashboard/DashboardKPIs';
 import ProjectsTable from '../components/dashboard/ProjectsTable';
-import { getProjectSummary } from '../utils/currentStepCalculator';
-
-// Simple icons
-const FolderIcon = ({ className }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-  </svg>
-);
+import { setFilters, clearFilters } from '../redux/slices/projectsSlice';
+import { getProjectSummary, calculateKPIs } from '../utils/currentStepCalculator';
+import { PRIORITIES } from '../constants/statusConfig';
 
 const Dashboard = () => {
-  const { items: projects } = useSelector((state) => state.projects);
+  const dispatch = useDispatch();
+  const { items: projects, filters } = useSelector((state) => state.projects);
   const { items: scopes } = useSelector((state) => state.scopes);
   const { items: estimates } = useSelector((state) => state.estimates);
   const { items: veRecords } = useSelector((state) => state.ve);
   const { items: users } = useSelector((state) => state.users);
 
-  // Calculate project summaries
+  // Calculate project summaries with current step
   const projectSummaries = useMemo(() => {
     return projects.map((project) =>
       getProjectSummary(project, scopes, estimates, veRecords, users)
     );
   }, [projects, scopes, estimates, veRecords, users]);
 
-  // Simple KPIs
-  const totalProjects = projects.length;
-  const activeProjects = projects.filter(p => p.status === 'Active').length;
+  // Apply filters
+  const filteredProjects = useMemo(() => {
+    return projectSummaries.filter((project) => {
+      if (filters.owner && project.projectOwner !== filters.owner) return false;
+      if (filters.program && project.program !== filters.program) return false;
+      if (filters.priority && project.priority !== filters.priority) return false;
+      if (filters.currentStep && project.currentStep !== filters.currentStep) return false;
+      if (filters.currentStepStatus && project.currentStepStatus !== filters.currentStepStatus) return false;
+      if (filters.dueDateFrom) {
+        const fromDate = new Date(filters.dueDateFrom);
+        const projectDate = new Date(project.estimateNeededBy);
+        if (projectDate < fromDate) return false;
+      }
+      if (filters.dueDateTo) {
+        const toDate = new Date(filters.dueDateTo);
+        const projectDate = new Date(project.estimateNeededBy);
+        if (projectDate > toDate) return false;
+      }
+      return true;
+    });
+  }, [projectSummaries, filters]);
+
+  // Calculate KPIs
+  const kpis = useMemo(() => {
+    return calculateKPIs(projects, scopes, estimates, veRecords, users);
+  }, [projects, scopes, estimates, veRecords, users]);
+
+  // Get unique values for filters
+  const filterOptions = useMemo(() => {
+    const owners = [...new Set(projects.map((p) => p.projectOwner))].map((id) => {
+      const user = users.find((u) => u.id === id);
+      return { value: id, label: user?.name || id };
+    });
+
+    const programs = [...new Set(projects.map((p) => p.program).filter(Boolean))].map(
+      (p) => ({ value: p, label: p })
+    );
+
+    const steps = ['Scope', 'Estimate', 'VE', 'Done'].map((s) => ({
+      value: s,
+      label: s
+    }));
+
+    const statuses = [
+      ...new Set(projectSummaries.map((p) => p.currentStepStatus))
+    ].map((s) => ({ value: s, label: s }));
+
+    return {
+      owners,
+      programs,
+      priorities: PRIORITIES.map((p) => ({ value: p, label: p })),
+      steps,
+      statuses
+    };
+  }, [projects, users, projectSummaries]);
+
+  const handleFilterChange = (newFilters) => {
+    dispatch(setFilters(newFilters));
+  };
+
+  const handleClearFilters = () => {
+    dispatch(clearFilters());
+  };
+
+  const handleKPIClick = (kpiKey) => {
+    // Quick filter based on KPI clicked
+    switch (kpiKey) {
+      case 'overdue':
+        // Filter would need special handling for overdue
+        break;
+      case 'scopeCompleted':
+        dispatch(setFilters({ currentStep: 'Estimate' }));
+        break;
+      case 'estimatesInReview':
+        dispatch(setFilters({ currentStep: 'Estimate' }));
+        break;
+      case 'veWaitingApproval':
+        dispatch(setFilters({ currentStep: 'VE', currentStepStatus: 'Waiting for Approval' }));
+        break;
+      default:
+        break;
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Project Estimates Dashboard</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Track and manage project estimates
+          Track and manage project estimates across all stages
         </p>
       </div>
 
-      {/* Simple KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <KPICard
-          title="Total Projects"
-          value={totalProjects}
-          icon={FolderIcon}
-          color="blue"
-        />
-        <KPICard
-          title="Active Projects"
-          value={activeProjects}
-          icon={FolderIcon}
-          color="green"
-        />
-      </div>
+      {/* KPI Cards */}
+      <DashboardKPIs kpis={kpis} onKPIClick={handleKPIClick} />
+
+      {/* Filters */}
+      <FilterBar
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        onClearFilters={handleClearFilters}
+        options={filterOptions}
+      />
 
       {/* Projects Table */}
-      <ProjectsTable projects={projectSummaries} />
+      <ProjectsTable projects={filteredProjects} />
     </div>
   );
 };

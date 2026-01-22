@@ -13,7 +13,7 @@ function App() {
       <Router>
         <div className="min-h-screen bg-gray-50">
           <Header />
-          <main>
+          <main className="pt-16">
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/projects/new" element={<CreateProject />} />

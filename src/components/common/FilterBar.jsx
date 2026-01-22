@@ -1,4 +1,5 @@
 import React from 'react';
+import { Filter, X } from 'lucide-react';
 import Select from './Select';
 import Input from './Input';
 import Button from './Button';
@@ -8,8 +9,25 @@ const FilterBar = ({ filters, onFilterChange, onClearFilters, options }) => {
     onFilterChange({ ...filters, [key]: value });
   };
 
+  const hasActiveFilters = Object.values(filters).some(v => v);
+
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+    <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-6 shadow-sm">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-2">
+          <Filter className="w-4 h-4 text-gray-400" />
+          <span className="text-sm font-medium text-gray-700">Filters</span>
+        </div>
+        {hasActiveFilters && (
+          <button
+            onClick={onClearFilters}
+            className="flex items-center space-x-1 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            <X className="w-4 h-4" />
+            <span>Clear all</span>
+          </button>
+        )}
+      </div>
       <div className="flex flex-wrap gap-4 items-end">
         <Select
           label="Owner"
@@ -17,7 +35,7 @@ const FilterBar = ({ filters, onFilterChange, onClearFilters, options }) => {
           onChange={(e) => handleChange('owner', e.target.value)}
           options={options.owners}
           placeholder="All Owners"
-          className="w-48"
+          className="w-44"
         />
 
         <Select
@@ -26,7 +44,7 @@ const FilterBar = ({ filters, onFilterChange, onClearFilters, options }) => {
           onChange={(e) => handleChange('program', e.target.value)}
           options={options.programs}
           placeholder="All Programs"
-          className="w-48"
+          className="w-44"
         />
 
         <Select
@@ -34,8 +52,8 @@ const FilterBar = ({ filters, onFilterChange, onClearFilters, options }) => {
           value={filters.priority || ''}
           onChange={(e) => handleChange('priority', e.target.value)}
           options={options.priorities}
-          placeholder="All Priorities"
-          className="w-36"
+          placeholder="All"
+          className="w-32"
         />
 
         <Select
@@ -44,7 +62,7 @@ const FilterBar = ({ filters, onFilterChange, onClearFilters, options }) => {
           onChange={(e) => handleChange('currentStep', e.target.value)}
           options={options.steps}
           placeholder="All Steps"
-          className="w-40"
+          className="w-36"
         />
 
         <Select
@@ -53,33 +71,24 @@ const FilterBar = ({ filters, onFilterChange, onClearFilters, options }) => {
           onChange={(e) => handleChange('currentStepStatus', e.target.value)}
           options={options.statuses}
           placeholder="All Statuses"
-          className="w-48"
+          className="w-44"
         />
 
         <Input
-          label="Due Date From"
+          label="Due From"
           type="date"
           value={filters.dueDateFrom || ''}
           onChange={(e) => handleChange('dueDateFrom', e.target.value)}
-          className="w-40"
+          className="w-44"
         />
 
         <Input
-          label="Due Date To"
+          label="Due To"
           type="date"
           value={filters.dueDateTo || ''}
           onChange={(e) => handleChange('dueDateTo', e.target.value)}
-          className="w-40"
+          className="w-44"
         />
-
-        <Button
-          variant="outline"
-          size="md"
-          onClick={onClearFilters}
-          className="mb-0.5"
-        >
-          Clear Filters
-        </Button>
       </div>
     </div>
   );

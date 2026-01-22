@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, StatusBadge } from '../common';
+import { formatCurrency, formatFTP } from '../../utils/formatters';
 import { formatDate } from '../../utils/dateUtils';
 
 const ProjectsTable = ({ projects }) => {
@@ -10,28 +11,67 @@ const ProjectsTable = ({ projects }) => {
     {
       key: 'projectId',
       header: 'Project ID',
-      width: '130px',
-      render: (value) => (
+      width: '120px',
+      render: (value, row) => (
         <span className="font-medium text-blue-600">{value}</span>
       )
     },
     {
       key: 'projectName',
       header: 'Project Name',
-      render: (value) => (
-        <span className="font-medium text-gray-900">{value}</span>
+      render: (value, row) => (
+        <div>
+          <span className="font-medium text-gray-900">{value}</span>
+          {row.isOverdue && (
+            <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">
+              Overdue
+            </span>
+          )}
+        </div>
       )
     },
     {
-      key: 'status',
-      header: 'Status',
+      key: 'currentStep',
+      header: 'Current Step',
       width: '120px',
       render: (value) => <StatusBadge status={value} size="sm" />
     },
     {
+      key: 'currentStepStatus',
+      header: 'Step Status',
+      width: '180px',
+      render: (value) => <StatusBadge status={value} size="sm" />
+    },
+    {
+      key: 'latestFTP',
+      header: 'FTP',
+      width: '100px',
+      render: (value) => (
+        <span className="text-gray-600">{formatFTP(value)}</span>
+      )
+    },
+    {
+      key: 'latestDollarValue',
+      header: '$ Value',
+      width: '120px',
+      render: (value) => (
+        <span className="font-medium">{formatCurrency(value)}</span>
+      )
+    },
+    {
+      key: 'estimateNeededBy',
+      header: 'Est. Needed By',
+      width: '130px',
+      render: (value, row) => (
+        <span className={row.isOverdue ? 'text-red-600 font-medium' : 'text-gray-600'}>
+          {formatDate(value)}
+        </span>
+      )
+    },
+    {
       key: 'ownerName',
       header: 'Owner',
-      width: '150px',
+      width: '140px',
       render: (value) => <span className="text-gray-600">{value}</span>
     },
     {
@@ -44,20 +84,12 @@ const ProjectsTable = ({ projects }) => {
           Medium: 'text-yellow-600 bg-yellow-50',
           Low: 'text-green-600 bg-green-50'
         };
-        return value ? (
+        return (
           <span className={`px-2 py-1 rounded text-xs font-medium ${colors[value] || ''}`}>
             {value}
           </span>
-        ) : <span className="text-gray-400">-</span>;
+        );
       }
-    },
-    {
-      key: 'estimateNeededBy',
-      header: 'Est. Needed By',
-      width: '140px',
-      render: (value) => (
-        <span className="text-gray-600">{formatDate(value)}</span>
-      )
     }
   ];
 

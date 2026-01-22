@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { FileText, ExternalLink, Sparkles, Clock, MessageSquare } from 'lucide-react';
 import { StatusBadge, Button, Modal, Select, TextArea } from '../common';
 import { updateScopeStatus } from '../../redux/slices/scopesSlice';
 import { addHistoryEntry } from '../../redux/slices/historySlice';
@@ -60,8 +61,10 @@ const ScopeList = ({ scopes, projectId }) => {
 
   if (scopes.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
-        No scope artifacts yet. Add your first scope document.
+      <div className="text-center py-12 text-gray-500">
+        <FileText className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+        <p className="font-medium">No scope artifacts yet</p>
+        <p className="text-sm mt-1">Add your first scope document to get started</p>
       </div>
     );
   }
@@ -71,47 +74,62 @@ const ScopeList = ({ scopes, projectId }) => {
       {scopes.map((scope) => (
         <div
           key={scope.id}
-          className={`border rounded-lg p-4 ${
-            scope.isLatest ? 'border-blue-200 bg-blue-50/30' : 'border-gray-200'
+          className={`border rounded-2xl p-5 transition-all duration-200 hover:shadow-md ${
+            scope.isLatest
+              ? 'border-blue-200 bg-gradient-to-br from-blue-50/50 to-white'
+              : 'border-gray-100 bg-white hover:border-gray-200'
           }`}
         >
           <div className="flex justify-between items-start">
             <div className="flex-1">
-              <div className="flex items-center space-x-2">
-                <h4 className="font-medium text-gray-900">{scope.scopeTitle}</h4>
+              <div className="flex items-center space-x-2 flex-wrap gap-y-2">
+                <FileText className="w-4 h-4 text-blue-500" />
+                <h4 className="font-semibold text-gray-900">{scope.scopeTitle}</h4>
                 {scope.isLatest && (
-                  <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
+                  <span className="inline-flex items-center px-2.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                    <Sparkles className="w-3 h-3 mr-1" />
                     Latest
                   </span>
                 )}
-                <span className="text-xs text-gray-500">v{scope.version}</span>
+                <span className="text-xs text-gray-400 font-medium">v{scope.version}</span>
               </div>
               {scope.scopeType && (
-                <p className="text-sm text-gray-500 mt-1">{scope.scopeType}</p>
+                <p className="text-sm text-gray-500 mt-1.5">{scope.scopeType}</p>
               )}
               <a
                 href={scope.artifactLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-blue-600 hover:underline mt-1 inline-block"
+                className="inline-flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700 mt-2 font-medium transition-colors"
               >
-                View Document
+                <span>View Document</span>
+                <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
             <div className="flex items-center space-x-3">
-              <button onClick={() => handleStatusClick(scope)}>
+              <button
+                onClick={() => handleStatusClick(scope)}
+                className="transition-transform hover:scale-105"
+              >
                 <StatusBadge status={scope.status} />
               </button>
             </div>
           </div>
-          <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between text-xs text-gray-500">
-            <span>Updated by {getUserName(scope.updatedBy)}</span>
-            <span>{formatDateTime(scope.updatedAt)}</span>
+          <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
+            <span className="flex items-center space-x-1">
+              <span>Updated by</span>
+              <span className="font-medium text-gray-700">{getUserName(scope.updatedBy)}</span>
+            </span>
+            <span className="flex items-center space-x-1">
+              <Clock className="w-3.5 h-3.5" />
+              <span>{formatDateTime(scope.updatedAt)}</span>
+            </span>
           </div>
           {scope.comments && (
-            <p className="mt-2 text-sm text-gray-600 bg-gray-50 p-2 rounded">
-              {scope.comments}
-            </p>
+            <div className="mt-3 flex items-start space-x-2 text-sm text-gray-600 bg-gray-50 p-3 rounded-xl">
+              <MessageSquare className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+              <p>{scope.comments}</p>
+            </div>
           )}
         </div>
       ))}

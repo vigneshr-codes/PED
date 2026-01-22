@@ -1,5 +1,12 @@
 import React from 'react';
-import { WORKFLOW_STEPS } from '../../constants/statusConfig';
+import { Check } from 'lucide-react';
+
+const WORKFLOW_STEPS = [
+  { key: 'project', label: 'Project', number: 1 },
+  { key: 'scope', label: 'Scope', number: 2 },
+  { key: 'estimate', label: 'Estimate', number: 3 },
+  { key: 've', label: 'VE Tool', number: 4 }
+];
 
 const Stepper = ({ currentStep, currentStepNumber }) => {
   const getStepStatus = (stepNumber) => {
@@ -11,16 +18,16 @@ const Stepper = ({ currentStep, currentStepNumber }) => {
   return (
     <div className="w-full">
       <div className="flex items-center justify-between">
-        {WORKFLOW_STEPS.slice(0, 4).map((step, index) => {
+        {WORKFLOW_STEPS.map((step, index) => {
           const status = getStepStatus(step.number);
-          const isLast = index === 3;
+          const isLast = index === WORKFLOW_STEPS.length - 1;
 
           return (
             <React.Fragment key={step.key}>
               <div className="flex flex-col items-center">
                 {/* Circle */}
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm border-2 ${
                     status === 'completed'
                       ? 'bg-green-500 border-green-500 text-white'
                       : status === 'current'
@@ -29,21 +36,9 @@ const Stepper = ({ currentStep, currentStepNumber }) => {
                   }`}
                 >
                   {status === 'completed' ? (
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <Check className="w-5 h-5" />
                   ) : (
-                    <span className="text-sm font-medium">{step.number}</span>
+                    step.number
                   )}
                 </div>
                 {/* Label */}
@@ -62,16 +57,15 @@ const Stepper = ({ currentStep, currentStepNumber }) => {
 
               {/* Connector line */}
               {!isLast && (
-                <div
-                  className={`flex-1 h-0.5 mx-2 ${
-                    getStepStatus(step.number + 1) === 'completed' ||
-                    status === 'completed'
-                      ? 'bg-green-500'
-                      : status === 'current'
-                        ? 'bg-blue-200'
-                        : 'bg-gray-200'
-                  }`}
-                />
+                <div className="flex-1 mx-4 h-0.5 bg-gray-200">
+                  <div
+                    className={`h-full ${
+                      status === 'completed'
+                        ? 'w-full bg-green-500'
+                        : 'w-0'
+                    }`}
+                  />
+                </div>
               )}
             </React.Fragment>
           );
