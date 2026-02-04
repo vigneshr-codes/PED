@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import ProjectHeader from '../components/project/ProjectHeader';
@@ -12,9 +12,13 @@ import VEList from '../components/ve/VEList';
 import HistoryList from '../components/history/HistoryList';
 import { Modal, Button, Alert } from '../components/common';
 import { updateProject } from '../redux/slices/projectsSlice';
-import { addScope } from '../redux/slices/scopesSlice';
-import { addEstimate } from '../redux/slices/estimatesSlice';
-import { addVERecord } from '../redux/slices/veSlice';
+import { createScope } from '../redux/slices/scopesSlice';
+import { createEstimate } from '../redux/slices/estimatesSlice';
+import { createVERecord } from '../redux/slices/veSlice';
+import { fetchScopesByProject } from '../redux/slices/scopesSlice';
+import { fetchEstimatesByProject } from '../redux/slices/estimatesSlice';
+import { fetchVEByProject } from '../redux/slices/veSlice';
+import { fetchHistoryByProject } from '../redux/slices/historySlice';
 import { getProjectSummary, calculateCurrentStep } from '../utils/currentStepCalculator';
 
 const tabs = [
@@ -41,6 +45,17 @@ const ProjectDetail = () => {
   const [showScopeModal, setShowScopeModal] = useState(false);
   const [showEstimateModal, setShowEstimateModal] = useState(false);
   const [showVEModal, setShowVEModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Fetch project-specific data on mount
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchScopesByProject(id));
+      dispatch(fetchEstimatesByProject(id));
+      dispatch(fetchVEByProject(id));
+      dispatch(fetchHistoryByProject(id));
+    }
+  }, [id, dispatch]);
 
   // Find project
   const project = projects.find((p) => p.uniqueId === id);
@@ -84,36 +99,64 @@ const ProjectDetail = () => {
   }
 
   // Handlers
-  const handleEditProject = (formData) => {
-    dispatch(updateProject({ ...formData, uniqueId: id }));
-    setShowEditModal(false);
+  const handleEditProject = async (formData) => {
+    setIsSubmitting(true);
+    try {
+      await dispatch(updateProject({ uniqueId: id, projectData: formData })).unwrap();
+      setShowEditModal(false);
+    } catch (err) {
+      console.error('Failed to update project:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleAddScope = (formData) => {
-    dispatch(addScope({
-      ...formData,
-      projectId: id,
-      createdBy: currentUser?.id,
-      updatedBy: currentUser?.id
-    }));
-    setShowScopeModal(false);
+  const handleAddScope = async (formData) => {
+    setIsSubmitting(true);
+    try {
+      await dispatch(createScope({
+        ...formData,
+        projectId: id,
+        createdBy: currentUser?.id,
+        updatedBy: currentUser?.id
+      })).unwrap();
+      setShowScopeModal(false);
+    } catch (err) {
+      console.error('Failed to add scope:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleAddEstimate = (formData) => {
-    dispatch(addEstimate({
-      ...formData,
-      projectId: id
-    }));
-    setShowEstimateModal(false);
+  const handleAddEstimate = async (formData) => {
+    setIsSubmitting(true);
+    try {
+      await dispatch(createEstimate({
+        ...formData,
+        projectId: id
+      })).unwrap();
+      setShowEstimateModal(false);
+    } catch (err) {
+      console.error('Failed to add estimate:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleAddVE = (formData) => {
-    dispatch(addVERecord({
-      ...formData,
-      projectId: id,
-      submittedBy: currentUser?.id
-    }));
-    setShowVEModal(false);
+  const handleAddVE = async (formData) => {
+    setIsSubmitting(true);
+    try {
+      await dispatch(createVERecord({
+        ...formData,
+        projectId: id,
+        submittedBy: currentUser?.id
+      })).unwrap();
+      setShowVEModal(false);
+    } catch (err) {
+      console.error('Failed to add VE record:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderTabContent = () => {

@@ -1,15 +1,15 @@
 import React, { useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { FilterBar } from '../components/common';
+import { FilterBar, Alert } from '../components/common';
 import DashboardKPIs from '../components/dashboard/DashboardKPIs';
 import ProjectsTable from '../components/dashboard/ProjectsTable';
-import { setFilters, clearFilters } from '../redux/slices/projectsSlice';
+import { setFilters, clearFilters, fetchProjects } from '../redux/slices/projectsSlice';
 import { getProjectSummary, calculateKPIs } from '../utils/currentStepCalculator';
 import { PRIORITIES } from '../constants/statusConfig';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
-  const { items: projects, filters } = useSelector((state) => state.projects);
+  const { items: projects, filters, loading, error } = useSelector((state) => state.projects);
   const { items: scopes } = useSelector((state) => state.scopes);
   const { items: estimates } = useSelector((state) => state.estimates);
   const { items: veRecords } = useSelector((state) => state.ve);
@@ -105,6 +105,22 @@ const Dashboard = () => {
         break;
     }
   };
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Alert variant="error" title="Failed to load projects">
+          {error}
+          <button
+            onClick={() => dispatch(fetchProjects())}
+            className="mt-2 text-sm text-red-600 hover:text-red-800 font-medium underline"
+          >
+            Retry
+          </button>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

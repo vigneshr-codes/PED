@@ -1,16 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import ProjectForm from '../components/project/ProjectForm';
-import { addProject } from '../redux/slices/projectsSlice';
+import { Alert } from '../components/common';
+import { createProject } from '../redux/slices/projectsSlice';
 
 const CreateProject = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { error } = useSelector((state) => state.projects);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (formData) => {
-    dispatch(addProject(formData));
-    navigate('/');
+  const handleSubmit = async (formData) => {
+    setIsSubmitting(true);
+    try {
+      await dispatch(createProject(formData)).unwrap();
+      navigate('/');
+    } catch (err) {
+      console.error('Failed to create project:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCancel = () => {
@@ -26,8 +36,18 @@ const CreateProject = () => {
         </p>
       </div>
 
+      {error && (
+        <Alert variant="error" title="Failed to create project">
+          {error}
+        </Alert>
+      )}
+
       <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <ProjectForm onSubmit={handleSubmit} onCancel={handleCancel} />
+        <ProjectForm
+          onSubmit={handleSubmit}
+          onCancel={handleCancel}
+          isSubmitting={isSubmitting}
+        />
       </div>
     </div>
   );

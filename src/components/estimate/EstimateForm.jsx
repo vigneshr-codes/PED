@@ -120,7 +120,7 @@ const EstimateForm = ({ initialData = {}, onSubmit, onCancel }) => {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Select
           label="Estimate Owner"
           required
@@ -137,6 +137,16 @@ const EstimateForm = ({ initialData = {}, onSubmit, onCancel }) => {
           value={formData.internalReviewers[0] || ''}
           onChange={(e) =>
             handleChange('internalReviewers', e.target.value ? [e.target.value] : [])
+          }
+          placeholder="Select reviewer"
+        />
+
+        <Select
+          label="External Reviewers"
+          options={userOptions}
+          value={formData.externalReviewers[0] || ''}
+          onChange={(e) =>
+            handleChange('externalReviewers', e.target.value ? [e.target.value] : [])
           }
           placeholder="Select reviewer"
         />

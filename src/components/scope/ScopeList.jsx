@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FileText, ExternalLink, Sparkles, Clock, MessageSquare } from 'lucide-react';
 import { StatusBadge, Button, Modal, Select, TextArea } from '../common';
 import { updateScopeStatus } from '../../redux/slices/scopesSlice';
-import { addHistoryEntry } from '../../redux/slices/historySlice';
 import { SCOPE_STATUSES } from '../../constants/statusConfig';
 import { formatDateTime } from '../../utils/dateUtils';
 
@@ -32,28 +31,20 @@ const ScopeList = ({ scopes, projectId }) => {
     const currentIndex = SCOPE_STATUSES.indexOf(scope.status);
     const newIndex = SCOPE_STATUSES.indexOf(newStatus);
 
-    // Check if moving backward and reason is required
     if (newIndex < currentIndex && !reason.trim()) {
       alert('Reason is required when moving to a previous status');
       return;
     }
 
-    // Update scope status
     dispatch(updateScopeStatus({
       id: scope.id,
       status: newStatus,
-      updatedBy: currentUser?.id
-    }));
-
-    // Add history entry
-    dispatch(addHistoryEntry({
+      updatedBy: currentUser?.id,
       projectId,
-      module: 'Scope',
-      recordId: scope.id,
-      fromStatus: scope.status,
-      toStatus: newStatus,
-      reason: reason || `Status changed to ${newStatus}`,
-      changedBy: currentUser?.id
+      reason: {
+        fromStatus: scope.status,
+        reason: reason || `Status changed to ${newStatus}`
+      }
     }));
 
     setStatusModal({ open: false, scope: null });

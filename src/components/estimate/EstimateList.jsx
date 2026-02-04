@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Calculator, DollarSign, ExternalLink, Sparkles, Clock, User, FileSpreadsheet, MessageSquare } from 'lucide-react';
 import { StatusBadge, Button, Modal, Select, TextArea } from '../common';
 import { updateEstimateStatus } from '../../redux/slices/estimatesSlice';
-import { addHistoryEntry } from '../../redux/slices/historySlice';
 import { ESTIMATE_STATUSES } from '../../constants/statusConfig';
 import { formatDateTime } from '../../utils/dateUtils';
 import { formatCurrency, formatFTP } from '../../utils/formatters';
@@ -33,7 +32,6 @@ const EstimateList = ({ estimates, projectId }) => {
     const currentIndex = ESTIMATE_STATUSES.indexOf(estimate.status);
     const newIndex = ESTIMATE_STATUSES.indexOf(newStatus);
 
-    // Check if skipping external review
     const skippingExternal =
       estimate.status === 'Sent for Internal Review' && newStatus === 'Approved';
 
@@ -48,17 +46,13 @@ const EstimateList = ({ estimates, projectId }) => {
 
     dispatch(updateEstimateStatus({
       id: estimate.id,
-      status: newStatus
-    }));
-
-    dispatch(addHistoryEntry({
+      status: newStatus,
       projectId,
-      module: 'Estimate',
-      recordId: estimate.id,
-      fromStatus: estimate.status,
-      toStatus: newStatus,
-      reason: reason || `Status changed to ${newStatus}`,
-      changedBy: currentUser?.id
+      reason: {
+        fromStatus: estimate.status,
+        reason: reason || `Status changed to ${newStatus}`,
+        changedBy: currentUser?.id
+      }
     }));
 
     setStatusModal({ open: false, estimate: null });

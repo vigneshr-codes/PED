@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Send, ExternalLink, Sparkles, Clock, DollarSign, User, CheckCircle, MessageSquare } from 'lucide-react';
 import { StatusBadge, Button, Modal, Select, TextArea } from '../common';
 import { updateVEStatus } from '../../redux/slices/veSlice';
-import { addHistoryEntry } from '../../redux/slices/historySlice';
 import { VE_STATUSES } from '../../constants/statusConfig';
 import { formatDateTime } from '../../utils/dateUtils';
 import { formatCurrency, formatFTP } from '../../utils/formatters';
@@ -33,17 +32,13 @@ const VEList = ({ veRecords, projectId }) => {
 
     dispatch(updateVEStatus({
       id: ve.id,
-      status: newStatus
-    }));
-
-    dispatch(addHistoryEntry({
+      status: newStatus,
       projectId,
-      module: 'VE',
-      recordId: ve.id,
-      fromStatus: ve.status,
-      toStatus: newStatus,
-      reason: reason || `Status changed to ${newStatus}`,
-      changedBy: currentUser?.id
+      reason: {
+        fromStatus: ve.status,
+        reason: reason || `Status changed to ${newStatus}`,
+        changedBy: currentUser?.id
+      }
     }));
 
     setStatusModal({ open: false, ve: null });
