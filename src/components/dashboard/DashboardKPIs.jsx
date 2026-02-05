@@ -2,7 +2,7 @@ import React from 'react';
 import { FolderKanban, CheckCircle2, FileText, Clock, AlertTriangle } from 'lucide-react';
 import { KPICard } from '../common';
 
-const DashboardKPIs = ({ kpis, onKPIClick }) => {
+const DashboardKPIs = ({ kpis }) => {
   const kpiConfig = [
     {
       key: 'totalActive',
@@ -50,7 +50,6 @@ const DashboardKPIs = ({ kpis, onKPIClick }) => {
           value={kpi.value}
           icon={kpi.icon}
           color={kpi.color}
-          onClick={() => onKPIClick && onKPIClick(kpi.key)}
         />
       ))}
     </div>

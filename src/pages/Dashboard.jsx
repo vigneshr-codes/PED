@@ -86,26 +86,6 @@ const Dashboard = () => {
     dispatch(clearFilters());
   };
 
-  const handleKPIClick = (kpiKey) => {
-    // Quick filter based on KPI clicked
-    switch (kpiKey) {
-      case 'overdue':
-        // Filter would need special handling for overdue
-        break;
-      case 'scopeCompleted':
-        dispatch(setFilters({ currentStep: 'Estimate' }));
-        break;
-      case 'estimatesInReview':
-        dispatch(setFilters({ currentStep: 'Estimate' }));
-        break;
-      case 'veWaitingApproval':
-        dispatch(setFilters({ currentStep: 'VE', currentStepStatus: 'Waiting for Approval' }));
-        break;
-      default:
-        break;
-    }
-  };
-
   if (error) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -132,7 +112,7 @@ const Dashboard = () => {
       </div>
 
       {/* KPI Cards */}
-      <DashboardKPIs kpis={kpis} onKPIClick={handleKPIClick} />
+      <DashboardKPIs kpis={kpis} />
 
       {/* Filters */}
       <FilterBar

@@ -1,22 +1,26 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { LayoutDashboard, PlusCircle, User } from 'lucide-react';
-import { setCurrentUser } from '../../redux/slices/usersSlice';
+import { LayoutDashboard, PlusCircle, Users, LogOut } from 'lucide-react';
+import { logout } from '../../redux/slices/usersSlice';
 
 const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { items: users, currentUser } = useSelector((state) => state.users);
+  const { currentUser } = useSelector((state) => state.users);
 
   const navItems = [
     { path: '/', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/projects/new', label: 'New Project', icon: PlusCircle }
+    { path: '/projects/new', label: 'New Project', icon: PlusCircle },
+    ...(currentUser?.role === 'Admin'
+      ? [{ path: '/users', label: 'Users', icon: Users }]
+      : [])
   ];
 
-  const handleUserChange = (e) => {
-    const user = users.find((u) => u.id === e.target.value);
-    dispatch(setCurrentUser(user));
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/login');
   };
 
   return (
@@ -58,32 +62,29 @@ const Header = () => {
             </nav>
           </div>
 
-          {/* User Selector */}
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 bg-gray-50 rounded-xl px-3 py-2">
-              <User className="w-4 h-4 text-gray-400" />
-              <select
-                value={currentUser?.id || ''}
-                onChange={handleUserChange}
-                className="text-sm bg-transparent border-none focus:outline-none focus:ring-0 text-gray-700 font-medium cursor-pointer"
-              >
-                {users.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name} ({user.role})
-                  </option>
-                ))}
-              </select>
-            </div>
-
+          {/* User Info + Logout */}
+          <div className="flex items-center space-x-3">
             {currentUser && (
-              <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center shadow-sm">
-                <span className="text-sm font-medium text-white">
-                  {currentUser.name
-                    .split(' ')
-                    .map((n) => n[0])
-                    .join('')}
-                </span>
-              </div>
+              <>
+                <div className="text-right">
+                  <p className="text-sm font-semibold text-gray-900">{currentUser.name}</p>
+                  <p className="text-xs text-gray-500">{currentUser.role}</p>
+                </div>
+                <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center shadow-sm">
+                  <span className="text-sm font-medium text-white">
+                    {currentUser.name
+                      .split(' ')
+                      .map((n) => n[0])
+                      .join('')}
+                  </span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </>
             )}
           </div>
         </div>

@@ -94,7 +94,7 @@ const ProjectsTable = ({ projects }) => {
   ];
 
   const handleRowClick = (row) => {
-    navigate(`/projects/${row.uniqueId}`);
+    navigate(`/projects/${row.projectId}`);
   };
 
   return (

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { usersService } from '../../services/usersService';
+import { setToken, clearToken } from '../../api/apiClient';
 
 export const fetchUsers = createAsyncThunk(
   'users/fetchUsers',
@@ -57,9 +58,22 @@ export const deleteUser = createAsyncThunk(
   }
 );
 
+export const loginUser = createAsyncThunk(
+  'users/loginUser',
+  async ({ email, password }, { rejectWithValue }) => {
+    try {
+      return await usersService.login({ email, password });
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const initialState = {
   items: [],
   currentUser: null,
+  token: null,
+  isLoggedIn: false,
   loading: false,
   error: null
 };
@@ -70,6 +84,12 @@ const usersSlice = createSlice({
   reducers: {
     setCurrentUser: (state, action) => {
       state.currentUser = action.payload;
+    },
+    logout: (state) => {
+      state.currentUser = null;
+      state.token = null;
+      state.isLoggedIn = false;
+      clearToken();
     }
   },
   extraReducers: (builder) => {
@@ -81,9 +101,6 @@ const usersSlice = createSlice({
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.loading = false;
         state.items = action.payload;
-        if (!state.currentUser && action.payload.length > 0) {
-          state.currentUser = action.payload[0];
-        }
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;
@@ -143,9 +160,31 @@ const usersSlice = createSlice({
       .addCase(deleteUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        // When auth is implemented, response shape becomes { user: {...}, token: '...' }
+        // For now, response is the user object directly
+        if (action.payload.token) {
+          state.currentUser = action.payload.user;
+          state.token = action.payload.token;
+          setToken(action.payload.token);
+        } else {
+          state.currentUser = action.payload;
+        }
+        state.isLoggedIn = true;
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   }
 });
 
-export const { setCurrentUser } = usersSlice.actions;
+export const { setCurrentUser, logout } = usersSlice.actions;
 export default usersSlice.reducer;

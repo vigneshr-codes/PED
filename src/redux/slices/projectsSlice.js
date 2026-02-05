@@ -57,6 +57,17 @@ export const deleteProject = createAsyncThunk(
   }
 );
 
+export const fetchProjectByProjectId = createAsyncThunk(
+  'projects/fetchProjectByProjectId',
+  async (projectId, { rejectWithValue }) => {
+    try {
+      return await projectInfoService.fetchByProjectId(projectId);
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const searchProjects = createAsyncThunk(
   'projects/searchProjects',
   async (term, { rejectWithValue }) => {
@@ -70,6 +81,7 @@ export const searchProjects = createAsyncThunk(
 
 const initialState = {
   items: [],
+  currentProject: null,
   loading: false,
   error: null,
   filters: {
@@ -127,6 +139,23 @@ const projectsSlice = createSlice({
         state.error = action.payload;
       })
 
+      .addCase(fetchProjectByProjectId.pending, (state) => {
+        state.currentProject = null;
+        state.error = null;
+      })
+      .addCase(fetchProjectByProjectId.fulfilled, (state, action) => {
+        state.currentProject = action.payload;
+        const index = state.items.findIndex((p) => p.projectId === action.payload.projectId);
+        if (index !== -1) {
+          state.items[index] = action.payload;
+        } else {
+          state.items.push(action.payload);
+        }
+      })
+      .addCase(fetchProjectByProjectId.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+
       .addCase(createProject.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -149,6 +178,9 @@ const projectsSlice = createSlice({
         const index = state.items.findIndex((p) => p.uniqueId === action.payload.uniqueId);
         if (index !== -1) {
           state.items[index] = action.payload;
+        }
+        if (state.currentProject && state.currentProject.uniqueId === action.payload.uniqueId) {
+          state.currentProject = action.payload;
         }
       })
       .addCase(updateProject.rejected, (state, action) => {

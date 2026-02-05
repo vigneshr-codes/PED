@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import ProjectHeader from '../components/project/ProjectHeader';
@@ -11,7 +11,7 @@ import VEForm from '../components/ve/VEForm';
 import VEList from '../components/ve/VEList';
 import HistoryList from '../components/history/HistoryList';
 import { Modal, Button, Alert } from '../components/common';
-import { updateProject } from '../redux/slices/projectsSlice';
+import { updateProject, fetchProjectByProjectId } from '../redux/slices/projectsSlice';
 import { createScope } from '../redux/slices/scopesSlice';
 import { createEstimate } from '../redux/slices/estimatesSlice';
 import { createVERecord } from '../redux/slices/veSlice';
@@ -34,7 +34,7 @@ const ProjectDetail = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { items: projects } = useSelector((state) => state.projects);
+  const { currentProject } = useSelector((state) => state.projects);
   const { items: scopes } = useSelector((state) => state.scopes);
   const { items: estimates } = useSelector((state) => state.estimates);
   const { items: veRecords } = useSelector((state) => state.ve);
@@ -46,19 +46,48 @@ const ProjectDetail = () => {
   const [showEstimateModal, setShowEstimateModal] = useState(false);
   const [showVEModal, setShowVEModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [projectLoading, setProjectLoading] = useState(true);
+  const [projectError, setProjectError] = useState(null);
+  const fetchedTabs = useRef(new Set());
 
-  // Fetch project-specific data on mount
+  // Fetch project info by projectId on mount
   useEffect(() => {
     if (id) {
-      dispatch(fetchScopesByProject(id));
-      dispatch(fetchEstimatesByProject(id));
-      dispatch(fetchVEByProject(id));
-      dispatch(fetchHistoryByProject(id));
+      setProjectLoading(true);
+      setProjectError(null);
+      dispatch(fetchProjectByProjectId(id))
+        .unwrap()
+        .catch((err) => setProjectError(err))
+        .finally(() => setProjectLoading(false));
     }
   }, [id, dispatch]);
 
-  // Find project
-  const project = projects.find((p) => p.uniqueId === id);
+  // Fetch tab-specific data only when tab is clicked
+  useEffect(() => {
+    if (!id || fetchedTabs.current.has(activeTab)) return;
+    switch (activeTab) {
+      case 'scope':
+        dispatch(fetchScopesByProject(id));
+        fetchedTabs.current.add('scope');
+        break;
+      case 'estimate':
+        dispatch(fetchEstimatesByProject(id));
+        fetchedTabs.current.add('estimate');
+        break;
+      case 've':
+        dispatch(fetchVEByProject(id));
+        fetchedTabs.current.add('ve');
+        break;
+      case 'history':
+        dispatch(fetchHistoryByProject(id));
+        fetchedTabs.current.add('history');
+        break;
+      default:
+        break;
+    }
+  }, [activeTab, id, dispatch]);
+
+  const project = currentProject;
 
   // Get related records
   const projectScopes = scopes
@@ -85,11 +114,29 @@ const ProjectDetail = () => {
     return getProjectSummary(project, scopes, estimates, veRecords, users);
   }, [project, scopes, estimates, veRecords, users]);
 
-  if (!project) {
+  if (projectLoading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 mb-3">
+              <svg className="w-5 h-5 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            </div>
+            <p className="text-gray-600 font-medium">Loading project details...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (projectError || !project) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Alert variant="error" title="Project not found">
-          The project you&apos;re looking for doesn&apos;t exist.
+          {projectError || 'The project you\'re looking for doesn\'t exist.'}
         </Alert>
         <Button className="mt-4" onClick={() => navigate('/')}>
           Back to Dashboard
@@ -102,7 +149,7 @@ const ProjectDetail = () => {
   const handleEditProject = async (formData) => {
     setIsSubmitting(true);
     try {
-      await dispatch(updateProject({ uniqueId: id, projectData: formData })).unwrap();
+      await dispatch(updateProject({ uniqueId: project.uniqueId, projectData: formData })).unwrap();
       setShowEditModal(false);
     } catch (err) {
       console.error('Failed to update project:', err);

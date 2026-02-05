@@ -11,13 +11,13 @@
 export const calculateCurrentStep = (project, scopes, estimates, veRecords) => {
   // Find the latest records for this project
   const latestScope = scopes.find(
-    s => s.projectId === project.uniqueId && s.isLatest
+    s => s.projectId === project.projectId && s.isLatest
   );
   const latestEstimate = estimates.find(
-    e => e.projectId === project.uniqueId && e.isLatest
+    e => e.projectId === project.projectId && e.isLatest
   );
   const latestVE = veRecords.find(
-    v => v.projectId === project.uniqueId && v.isLatest
+    v => v.projectId === project.projectId && v.isLatest
   );
 
   // Step 1: Check Scope
@@ -66,9 +66,9 @@ export const getProjectSummary = (project, scopes, estimates, veRecords, users) 
   const currentStepInfo = calculateCurrentStep(project, scopes, estimates, veRecords);
 
   // Get latest records
-  const latestScope = scopes.find(s => s.projectId === project.uniqueId && s.isLatest);
-  const latestEstimate = estimates.find(e => e.projectId === project.uniqueId && e.isLatest);
-  const latestVE = veRecords.find(v => v.projectId === project.uniqueId && v.isLatest);
+  const latestScope = scopes.find(s => s.projectId === project.projectId && s.isLatest);
+  const latestEstimate = estimates.find(e => e.projectId === project.projectId && e.isLatest);
+  const latestVE = veRecords.find(v => v.projectId === project.projectId && v.isLatest);
 
   // Get owner and estimator names
   const owner = users.find(u => u.id === project.projectOwner);
